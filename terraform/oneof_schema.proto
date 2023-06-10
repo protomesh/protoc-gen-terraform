@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package protomesh.terraform;
+
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/protomesh/protoc-gen-terraform/proto/terraform;terraformpb";
+
+message OneofSchema {
+
+
+}

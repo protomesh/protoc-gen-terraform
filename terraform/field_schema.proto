@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package protomesh.terraform;
+
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/protomesh/protoc-gen-terraform/proto/terraform;terraformpb";
+
+message FieldSchema {
+
+    // List types can also be TypeSet in terraform
+    bool is_type_set = 1;
+
+    // Is this field required
+    bool required = 2;
+
+    // Default value for this field
+    google.protobuf.Value default_value = 3;
+
+    // Is this field computed
+    bool computed = 4;
+
+}

@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package protomesh.terraform;
+
+option go_package = "github.com/protomesh/protoc-gen-terraform/proto/terraform;terraformpb";
+
+message FileSchema {
+
+    map<string, string> import_map = 1;
+
+}

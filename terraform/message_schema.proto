@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package protomesh.terraform;
+
+option go_package = "github.com/protomesh/protoc-gen-terraform/proto/terraform;terraformpb";
+
+message MessageSchema {
+
+    // Generate Schema for this message
+    bool generate = 1;
+
+    // Is resource (get/set values from/to resource data)
+    bool is_resource = 2;
+
+}

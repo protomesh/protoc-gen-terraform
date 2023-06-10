@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package protomesh.terraform;
+
+import "google/protobuf/descriptor.proto";
+
+import "terraform/field_schema.proto";
+import "terraform/message_schema.proto";
+import "terraform/oneof_schema.proto";
+import "terraform/enum_schema.proto";
+import "terraform/file_schema.proto";
+
+option go_package = "github.com/protomesh/protoc-gen-terraform/proto/terraform;terraformpb";
+
+extend google.protobuf.FileOptions {
+  // ID assigned by protobuf-global-extension-registry@google.com.
+  //
+  // All IDs are the same, as assigned. It is okay that they are the same, as they extend
+  // different descriptor messages.
+  protomesh.terraform.FileSchema file_schema = 5015;
+}
+
+// extend google.protobuf.MethodOptions {
+//   // ID assigned by protobuf-global-extension-registry@google.com.
+//   //
+//   // All IDs are the same, as assigned. It is okay that they are the same, as they extend
+//   // different descriptor messages.
+//   Operation openapiv2_operation = 5015;
+// }
+
+extend google.protobuf.MessageOptions {
+  // ID assigned by protobuf-global-extension-registry@google.com.
+  //
+  // All IDs are the same, as assigned. It is okay that they are the same, as they extend
+  // different descriptor messages.
+  protomesh.terraform.MessageSchema message_schema = 5015;
+}
+
+// extend google.protobuf.ServiceOptions {
+//   // ID assigned by protobuf-global-extension-registry@google.com.
+//   //
+//   // All IDs are the same, as assigned. It is okay that they are the same, as they extend
+//   // different descriptor messages.
+//   Tag openapiv2_tag = 5015;
+// }
+
+extend google.protobuf.FieldOptions {
+  // ID assigned by protobuf-global-extension-registry@google.com.
+  //
+  // All IDs are the same, as assigned. It is okay that they are the same, as they extend
+  // different descriptor messages.
+  protomesh.terraform.FieldSchema field_schema = 5015;
+}
+
+extend google.protobuf.OneofOptions {
+  // ID assigned by protobuf-global-extension-registry@google.com.
+  //
+  // All IDs are the same, as assigned. It is okay that they are the same, as they extend
+  // different descriptor messages.
+  protomesh.terraform.OneofSchema oneof_schema = 5015;
+}
+
+extend google.protobuf.EnumOptions {
+  // ID assigned by protobuf-global-extension-registry@google.com.
+  //
+  // All IDs are the same, as assigned. It is okay that they are the same, as they extend
+  // different descriptor messages.
+  protomesh.terraform.EnumSchema enum_schema = 5015;
+}
