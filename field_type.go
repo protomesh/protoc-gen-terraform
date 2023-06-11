@@ -480,3 +480,141 @@ func (fdInfo *fieldInfo) getFieldGoType() string {
 	return "any"
 
 }
+
+func (fdInfo *fieldInfo) writeMarshal(t tab, gen *protogen.GeneratedFile, mi mapIndexMaker) {
+
+	collectionType := fdInfo.getFieldGoCollectionType()
+	fieldType := fdInfo.getFieldGoType()
+
+	mapIndex := mi.makeMapIndex(fdInfo.fieldKey)
+
+	if len(collectionType) > 0 {
+
+		switch {
+
+		case fdInfo.value.Desc.IsList():
+
+			t.P(gen, `if l, ok := obj["`, fdInfo.fieldKey, `"].([]interface{}); ok {`)
+
+			t++
+
+			t.P(gen, mapIndex, ` = []interface{}{}`)
+			t.P(gen, `for _, i := range l {`)
+
+			t++
+
+			switch {
+
+			case fdInfo.value.Desc.Kind() == protoreflect.MessageKind:
+
+				mInfo := newMessageInfo(fdInfo.fInfo, fdInfo.value.Message)
+
+				t.P(gen, `d, err := `, mInfo.prefixWithPackage(mInfo.marshalFunctionName), `(i.(map[string]interface{}))`)
+				t.P(gen, `if err != nil {`)
+				t++
+				t.P(gen, `return nil, err`)
+				t--
+				t.P(gen, `}`)
+
+			default:
+				t.P(gen, `d := i.(`, fieldType, `)`)
+
+			}
+
+			t.P(gen, `p["`, fdInfo.fieldKey, `"] = append(p["`, fdInfo.fieldKey, `"].([]interface{}), d)`)
+
+			t--
+
+			t.P(gen, `}`)
+
+			t--
+
+			t.P(gen, `}`)
+
+		case fdInfo.value.Desc.IsMap():
+
+			t.P(gen, `if m, ok := obj["`, fdInfo.fieldKey, `"].(map[string]interface{}); ok {`)
+
+			t++
+
+			t.P(gen, `p["`, fdInfo.fieldKey, `"] = map[string]interface{}{}`)
+			t.P(gen, `for k, v := range m {`)
+
+			t++
+
+			switch {
+
+			case fdInfo.value.Desc.Kind() == protoreflect.MessageKind:
+
+				mInfo := newMessageInfo(fdInfo.fInfo, fdInfo.value.Message)
+
+				t.P(gen, `d, err := `, mInfo.prefixWithPackage(mInfo.marshalFunctionName), `(i.(map[string]interface{}))`)
+				t.P(gen, `if err != nil {`)
+				t++
+				t.P(gen, `return nil, err`)
+				t--
+				t.P(gen, `}`)
+
+			default:
+				t.P(gen, `d := i.(`, fieldType, `)`)
+
+			}
+
+			t.P(gen, mapIndex, `[k] = d`)
+
+			t--
+
+			t.P(gen, `}`)
+
+			t--
+
+			t.P(gen, `}`)
+
+		case fdInfo.value.Desc.Kind() == protoreflect.MessageKind:
+
+			mInfo := newMessageInfo(fdInfo.fInfo, fdInfo.value.Message)
+
+			t.P(gen, `if m, ok := obj["`, fdInfo.fieldKey, `"].(map[string]interface{}); ok {`)
+
+			t++
+
+			t.P(gen, `d, err := `, mInfo.prefixWithPackage(mInfo.marshalFunctionName), `(m)`)
+			t.P(gen, `if err != nil {`)
+			t++
+			t.P(gen, `return nil, err`)
+			t--
+			t.P(gen, `}`)
+			t.P(gen, mapIndex, ` = []interface{}{d}`)
+
+			t--
+
+			t.P(gen, `}`)
+
+		}
+
+		return
+	}
+	switch fdInfo.value.Desc.Kind() {
+
+	case protoreflect.BoolKind, protoreflect.StringKind, protoreflect.EnumKind, protoreflect.BytesKind,
+		protoreflect.Sfixed32Kind, protoreflect.Sfixed64Kind, protoreflect.Fixed32Kind,
+		protoreflect.Fixed64Kind, protoreflect.Int32Kind, protoreflect.Int64Kind,
+		protoreflect.Sint32Kind, protoreflect.Sint64Kind, protoreflect.Uint32Kind,
+		protoreflect.Uint64Kind, protoreflect.DoubleKind, protoreflect.FloatKind:
+
+		switch fdInfo.value.Desc.Kind() {
+
+		case protoreflect.BytesKind:
+			t.P(gen, `if v, ok := obj["`, fdInfo.fieldKey, `"].(string); ok {`)
+			t++
+			t.P(gen, mapIndex, `, _ = []byte(v)`)
+			t--
+			t.P(gen, `}`)
+		default:
+			t.P(gen, mapIndex, `, _ = obj["`, fdInfo.fieldKey, `"].(`, fieldType, `)`)
+
+		}
+
+	}
+
+}

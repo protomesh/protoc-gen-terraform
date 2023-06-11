@@ -108,6 +108,10 @@ func (oInfo *oneOfInfo) makeSelector(fieldKey string) string {
 	return "oneOfVal"
 }
 
+func (oInfo *oneOfInfo) makeMapIndex(fieldKey string) string {
+	return fmt.Sprintf(`p["%s"].([]interface{})[0].(map[string]interface{})["%s"]`, oInfo.oneOfKey, fieldKey)
+}
+
 func (oInfo *oneOfInfo) writeUnmarshal(t tab, gen *protogen.GeneratedFile, sm selectorMaker) {
 
 	selector := sm.makeSelector(oInfo.oneOfKey)
@@ -138,6 +142,34 @@ func (oInfo *oneOfInfo) writeUnmarshal(t tab, gen *protogen.GeneratedFile, sm se
 	t.P(gen, `}`)
 
 	t--
+
+	t.P(gen, `}`)
+
+}
+
+func (oInfo *oneOfInfo) writeMarshal(t tab, gen *protogen.GeneratedFile, mi mapIndexMaker) {
+
+	selector := mi.makeMapIndex(oInfo.oneOfKey)
+
+	t.P(gen, selector, ` = []interface{}{}`)
+
+	cond := `if`
+
+	for _, f := range oInfo.value.Fields {
+
+		oneOfFInfo := newFieldInfo(oInfo.fInfo, f)
+
+		t.P(gen, cond, ` _, ok := obj["`, oneOfFInfo.fieldKey, `"]; ok {`)
+		t++
+		t.P(gen, selector, ` = append(`, selector, `.([]interface{}), map[string]interface{}{})`)
+		oneOfFInfo.writeMarshal(t, gen, oInfo)
+		t--
+
+		if len(oInfo.value.Fields) > 1 {
+			cond = `} else if`
+		}
+
+	}
 
 	t.P(gen, `}`)
 

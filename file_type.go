@@ -74,6 +74,9 @@ func (fInfo *fileInfo) writeFunctions(t tab, gen *protogen.GeneratedFile) {
 		mInfo.writeUnmarshaler(t, gen)
 		gen.P()
 
+		mInfo.writeMarshaler(t, gen)
+		gen.P()
+
 	}
 
 }

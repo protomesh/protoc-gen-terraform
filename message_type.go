@@ -95,7 +95,11 @@ func (mInfo *messageInfo) prefixWithPackage(suffix string) string {
 }
 
 func (mInfo *messageInfo) makeSelector(fieldKey string) string {
-	return fmt.Sprintf(mInfo.selector, fieldKey)
+	return mInfo.selector
+}
+
+func (mInfo *messageInfo) makeMapIndex(fieldKey string) string {
+	return fmt.Sprintf(`p["%s"]`, fieldKey)
 }
 
 func (mInfo *messageInfo) writeSchemaFunction(t tab, gen *protogen.GeneratedFile) {
@@ -140,9 +144,89 @@ func (mInfo *messageInfo) writeSchemaFunction(t tab, gen *protogen.GeneratedFile
 
 func (mInfo *messageInfo) writeMarshaler(t tab, gen *protogen.GeneratedFile) {
 
-	t.P(gen, `func `, mInfo.marshalFunctionName, `() {`)
+	t.P(gen, `func `, mInfo.marshalFunctionName, `(obj map[string]interface{}) (map[string]interface{}, error) {`)
+
+	t++
+
+	t.P(gen, `p := map[string]interface{}{}`)
+
+	for _, field := range mInfo.value.Fields {
+
+		if field.Oneof == nil {
+
+			fdInfo := newFieldInfo(mInfo.fInfo, field)
+
+			fdInfo.writeMarshal(t, gen, mInfo)
+
+		}
+
+	}
+
+	for _, oneOf := range mInfo.value.Oneofs {
+
+		oInfo := newOneOfInfo(mInfo.fInfo, oneOf)
+
+		oInfo.writeMarshal(t, gen, mInfo)
+
+	}
+
+	t.P(gen, `return p, nil`)
+
+	t--
 
 	t.P(gen, `}`)
+
+	gen.P()
+	// Proto
+
+	t.P(gen, `func `, mInfo.marshalFunctionName, `Proto(m proto.Message) (map[string]interface{}, error) {`)
+
+	t++
+
+	t.P(gen, `obj := map[string]interface{}{}`)
+
+	t.P(gen, `b, err := protojson.Marshal(m)`)
+	t.P(gen, `if err != nil {`)
+	t++
+	t.P(gen, `return nil, err`)
+	t--
+	t.P(gen, `}`)
+
+	t.P(gen, `err = json.Unmarshal(b, &obj)`)
+	t.P(gen, `if err != nil {`)
+	t++
+	t.P(gen, `return nil, err`)
+	t--
+	t.P(gen, `}`)
+
+	t.P(gen, `return `, mInfo.marshalFunctionName, `(obj)`)
+
+	t--
+
+	t.P(gen, `}`)
+
+	gen.P()
+
+	if mInfo.schema.IsResource {
+
+		t.P(gen, `func `, mInfo.marshalFunctionName, `ResourceData(m proto.Message, rd *schema.ResourceData) {`)
+
+		t++
+
+		t.P(gen, `pMap := `, mInfo.marshalFunctionName, `Proto(m)`)
+		t.P(gen, `for k, v := range pMap {`)
+		t++
+		t.P(gen, `rd.Set(k, v)`)
+		t--
+		t.P(gen, `}`)
+
+		t--
+
+		t.P(gen, `}`)
+
+		gen.P()
+
+	}
 
 }
 
