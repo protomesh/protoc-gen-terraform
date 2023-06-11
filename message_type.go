@@ -95,7 +95,7 @@ func (mInfo *messageInfo) prefixWithPackage(suffix string) string {
 }
 
 func (mInfo *messageInfo) makeSelector(fieldKey string) string {
-	return mInfo.selector
+	return fmt.Sprintf(mInfo.selector, fieldKey)
 }
 
 func (mInfo *messageInfo) makeMapIndex(fieldKey string) string {
@@ -185,7 +185,7 @@ func (mInfo *messageInfo) writeMarshaler(t tab, gen *protogen.GeneratedFile) {
 
 	t.P(gen, `obj := map[string]interface{}{}`)
 
-	t.P(gen, `b, err := protojson.Marshal(m)`)
+	t.P(gen, `b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)`)
 	t.P(gen, `if err != nil {`)
 	t++
 	t.P(gen, `return nil, err`)
