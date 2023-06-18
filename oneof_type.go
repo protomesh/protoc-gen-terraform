@@ -122,24 +122,18 @@ func (oInfo *oneOfInfo) writeUnmarshal(t tab, gen *protogen.GeneratedFile, sm se
 
 	t.P(gen, `o := `, oInfo.valueVar, `[0].(map[string]interface{})`)
 
-	cond := `if`
-
 	for _, f := range oInfo.value.Fields {
 
 		oneOfFInfo := newFieldInfo(oInfo.fInfo, f)
 
-		t.P(gen, cond, ` oneOfVal, ok := o["`, oneOfFInfo.fieldKey, `"]; ok {`)
+		t.P(gen, ` if oneOfVal, ok := o["`, oneOfFInfo.fieldKey, `"]; ok {`)
 		t++
 		oneOfFInfo.writeUnmarshal(t, gen, oInfo)
 		t--
 
-		if len(oInfo.value.Fields) > 1 {
-			cond = `} else if`
-		}
+		t.P(gen, `}`)
 
 	}
-
-	t.P(gen, `}`)
 
 	t--
 
@@ -153,24 +147,18 @@ func (oInfo *oneOfInfo) writeMarshal(t tab, gen *protogen.GeneratedFile, mi mapI
 
 	t.P(gen, selector, ` = []interface{}{}`)
 
-	cond := `if`
-
 	for _, f := range oInfo.value.Fields {
 
 		oneOfFInfo := newFieldInfo(oInfo.fInfo, f)
 
-		t.P(gen, cond, ` _, ok := obj["`, oneOfFInfo.fieldKey, `"]; ok {`)
+		t.P(gen, `if _, ok := obj["`, oneOfFInfo.fieldKey, `"]; ok {`)
 		t++
 		t.P(gen, selector, ` = append(`, selector, `.([]interface{}), map[string]interface{}{})`)
 		oneOfFInfo.writeMarshal(t, gen, oInfo)
 		t--
 
-		if len(oInfo.value.Fields) > 1 {
-			cond = `} else if`
-		}
+		t.P(gen, `}`)
 
 	}
-
-	t.P(gen, `}`)
 
 }
