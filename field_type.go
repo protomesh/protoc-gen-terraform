@@ -186,14 +186,6 @@ func (fdInfo *fieldInfo) writeSchemaElement(t tab, gen *protogen.GeneratedFile) 
 
 func (fdInfo *fieldInfo) writeSchemaOptions(t tab, gen *protogen.GeneratedFile) {
 
-	if fdInfo.schema.Required {
-		t.P(gen, `Required: true,`)
-	} else if fdInfo.schema.Computed {
-		t.P(gen, `Computed: true,`)
-	} else {
-		t.P(gen, `Optional: true,`)
-	}
-
 	if fdInfo.value.Enum != nil {
 
 		eInfo := newEnumInfo(fdInfo.value.Enum)
@@ -202,6 +194,8 @@ func (fdInfo *fieldInfo) writeSchemaOptions(t tab, gen *protogen.GeneratedFile) 
 	}
 
 	if fdInfo.schema.DefaultValue != nil {
+
+		t.P(gen, `Optional: true,`)
 
 		switch val := fdInfo.schema.DefaultValue.Kind.(type) {
 
@@ -229,6 +223,12 @@ func (fdInfo *fieldInfo) writeSchemaOptions(t tab, gen *protogen.GeneratedFile) 
 			}
 
 		}
+	} else if fdInfo.schema.Required {
+		t.P(gen, `Required: true,`)
+	} else if fdInfo.schema.Computed {
+		t.P(gen, `Computed: true,`)
+	} else {
+		t.P(gen, `Optional: true,`)
 	}
 
 	if len(fdInfo.value.Comments.Leading) > 0 {
