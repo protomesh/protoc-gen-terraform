@@ -109,6 +109,8 @@ func (in *importNeeds) discoverMessage(msg *protogen.Message) {
 
 			}
 
+		} else if field.Enum != nil {
+			in.needValidation = true
 		}
 
 	}

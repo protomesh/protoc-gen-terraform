@@ -2,7 +2,11 @@ module github.com/protomesh/protoc-gen-terraform
 
 go 1.20
 
-require github.com/hashicorp/terraform-plugin-sdk/v2 v2.26.1
+require (
+	github.com/hashicorp/terraform-plugin-sdk/v2 v2.26.1
+	github.com/iancoleman/strcase v0.2.0
+	google.golang.org/protobuf v1.30.0
+)
 
 require (
 	github.com/agext/levenshtein v1.2.2 // indirect
@@ -20,7 +24,6 @@ require (
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/hashicorp/terraform-plugin-go v0.14.3 // indirect
 	github.com/hashicorp/terraform-plugin-log v0.8.0 // indirect
-	github.com/iancoleman/strcase v0.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
@@ -36,5 +39,4 @@ require (
 	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
 	google.golang.org/appengine v1.6.6 // indirect
-	google.golang.org/protobuf v1.30.0 // indirect
 )
