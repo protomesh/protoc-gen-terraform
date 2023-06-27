@@ -124,7 +124,7 @@ func (fdInfo *fieldInfo) writeSchemaType(t tab, gen *protogen.GeneratedFile) {
 		switch msg.FullName() {
 
 		case wellKnownDuration:
-			t.P(gen, `Type: schema.TypeInt,`)
+			t.P(gen, `Type: schema.TypeString,`)
 
 		default:
 			t.P(gen, `Type: schema.TypeList,`)
@@ -368,6 +368,24 @@ func (fdInfo *fieldInfo) writeUnmarshal(t tab, gen *protogen.GeneratedFile, sm s
 
 	switch fdInfo.value.Desc.Kind() {
 
+	case protoreflect.MessageKind:
+
+		switch fdInfo.value.Desc.Message().FullName() {
+
+		case wellKnownDuration:
+
+			t.P(gen, `if `, fdInfo.valueVar, `, `, fdInfo.okVar, ` := `, selector, `.(string); `, fdInfo.okVar, ` {`)
+
+			t++
+
+			t.P(gen, `p["`, fdInfo.fieldKey, `"] = `, fdInfo.valueVar)
+
+			t--
+
+			t.P(gen, `}`)
+
+		}
+
 	case protoreflect.BoolKind, protoreflect.StringKind, protoreflect.EnumKind, protoreflect.BytesKind,
 		protoreflect.Sfixed32Kind, protoreflect.Sfixed64Kind, protoreflect.Fixed32Kind,
 		protoreflect.Fixed64Kind, protoreflect.Int32Kind, protoreflect.Int64Kind,
@@ -448,7 +466,7 @@ func (fdInfo *fieldInfo) getFieldGoType() string {
 		switch msg.FullName() {
 
 		case wellKnownDuration:
-			return "int"
+			return "string"
 
 		default:
 			return "map[string]interface{}"
@@ -595,6 +613,14 @@ func (fdInfo *fieldInfo) writeMarshal(t tab, gen *protogen.GeneratedFile, mi map
 		return
 	}
 	switch fdInfo.value.Desc.Kind() {
+
+	case protoreflect.MessageKind:
+
+		switch fdInfo.value.Desc.Message().FullName() {
+
+		case wellKnownDuration:
+			t.P(gen, mapIndex, `, _ = obj["`, fdInfo.fieldKey, `"].(string)`)
+		}
 
 	case protoreflect.BoolKind, protoreflect.StringKind, protoreflect.EnumKind, protoreflect.BytesKind,
 		protoreflect.Sfixed32Kind, protoreflect.Sfixed64Kind, protoreflect.Fixed32Kind,
