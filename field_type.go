@@ -250,7 +250,7 @@ func (fdInfo *fieldInfo) writeUnmarshal(t tab, gen *protogen.GeneratedFile, sm s
 
 		case fdInfo.value.Desc.IsList():
 
-			t.P(gen, `if `, fdInfo.valueVar, `, `, fdInfo.okVar, ` := `, selector, `.(`, collectionType, `); `, fdInfo.okVar, ` {`)
+			t.P(gen, `if `, fdInfo.valueVar, `, `, fdInfo.okVar, ` := `, selector, `.(`, collectionType, `); `, fdInfo.okVar, ` && reflect.ValueOf(`, fdInfo.valueVar, `).IsValid() && !reflect.ValueOf(`, fdInfo.valueVar, `).IsZero()  {`)
 
 			t++
 
@@ -334,7 +334,7 @@ func (fdInfo *fieldInfo) writeUnmarshal(t tab, gen *protogen.GeneratedFile, sm s
 
 		case fdInfo.value.Desc.Kind() == protoreflect.MessageKind:
 
-			t.P(gen, `if `, fdInfo.valueVar, `Collection, `, fdInfo.okVar, ` := `, selector, `.(`, collectionType, `); `, fdInfo.okVar, ` && len(`, fdInfo.valueVar, `Collection) > 0 {`)
+			t.P(gen, `if `, fdInfo.valueVar, `Collection, `, fdInfo.okVar, ` := `, selector, `.(`, collectionType, `); `, fdInfo.okVar, ` && reflect.ValueOf(`, fdInfo.valueVar, `Collection).IsValid() && !reflect.ValueOf(`, fdInfo.valueVar, `Collection).IsZero() && len(`, fdInfo.valueVar, `Collection) > 0 {`)
 
 			t++
 
@@ -374,7 +374,7 @@ func (fdInfo *fieldInfo) writeUnmarshal(t tab, gen *protogen.GeneratedFile, sm s
 
 		case wellKnownDuration:
 
-			t.P(gen, `if `, fdInfo.valueVar, `, `, fdInfo.okVar, ` := `, selector, `.(string); `, fdInfo.okVar, ` {`)
+			t.P(gen, `if `, fdInfo.valueVar, `, `, fdInfo.okVar, ` := `, selector, `.(string); `, fdInfo.okVar, ` && reflect.ValueOf(`, fdInfo.valueVar, `).IsValid() && !reflect.ValueOf(`, fdInfo.valueVar, `).IsZero() {`)
 
 			t++
 
@@ -392,7 +392,7 @@ func (fdInfo *fieldInfo) writeUnmarshal(t tab, gen *protogen.GeneratedFile, sm s
 		protoreflect.Sint32Kind, protoreflect.Sint64Kind, protoreflect.Uint32Kind,
 		protoreflect.Uint64Kind, protoreflect.DoubleKind, protoreflect.FloatKind:
 
-		t.P(gen, `if `, fdInfo.valueVar, `, `, fdInfo.okVar, ` := `, selector, `.(`, fieldType, `); `, fdInfo.okVar, ` {`)
+		t.P(gen, `if `, fdInfo.valueVar, `, `, fdInfo.okVar, ` := `, selector, `.(`, fieldType, `); `, fdInfo.okVar, ` && reflect.ValueOf(`, fdInfo.valueVar, `).IsValid() && !reflect.ValueOf(`, fdInfo.valueVar, `).IsZero() {`)
 
 		t++
 

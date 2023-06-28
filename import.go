@@ -141,6 +141,7 @@ func (in *importNeeds) writeFile(t tab, gen *protogen.GeneratedFile) {
 		t.P(gen, `"google.golang.org/protobuf/encoding/protojson"`)
 		t.P(gen, `"google.golang.org/protobuf/proto"`)
 		t.P(gen, `"encoding/json"`)
+		t.P(gen, `"reflect"`)
 	}
 
 	for filePath, packageName := range in.usedCustomImports {
