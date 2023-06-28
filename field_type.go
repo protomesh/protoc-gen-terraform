@@ -473,17 +473,10 @@ func (fdInfo *fieldInfo) getFieldGoType() string {
 
 		}
 
-	case protoreflect.Uint64Kind:
-		return "uint64"
-
-	case protoreflect.Uint32Kind:
-		return "uint32"
-
-	case protoreflect.Sfixed64Kind, protoreflect.Int64Kind, protoreflect.Sint64Kind, protoreflect.Fixed64Kind:
-		return "int64"
-
-	case protoreflect.Sfixed32Kind, protoreflect.Int32Kind, protoreflect.Sint32Kind, protoreflect.Fixed32Kind:
-		return "int32"
+	case protoreflect.Uint64Kind, protoreflect.Uint32Kind,
+		protoreflect.Sfixed64Kind, protoreflect.Int64Kind, protoreflect.Sint64Kind, protoreflect.Fixed64Kind,
+		protoreflect.Sfixed32Kind, protoreflect.Int32Kind, protoreflect.Sint32Kind, protoreflect.Fixed32Kind:
+		return "int"
 
 	case
 		protoreflect.FloatKind:
