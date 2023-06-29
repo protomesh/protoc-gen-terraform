@@ -396,15 +396,7 @@ func (fdInfo *fieldInfo) writeUnmarshal(t tab, gen *protogen.GeneratedFile, sm s
 
 		t++
 
-		switch fdInfo.value.Desc.Kind() {
-
-		case protoreflect.BytesKind:
-			t.P(gen, `p["`, fdInfo.fieldKey, `"] = []byte(`, fdInfo.valueVar, `)`)
-
-		default:
-			t.P(gen, `p["`, fdInfo.fieldKey, `"] = `, fdInfo.valueVar)
-
-		}
+		t.P(gen, `p["`, fdInfo.fieldKey, `"] = `, fdInfo.valueVar)
 
 		t--
 
@@ -458,7 +450,10 @@ func (fdInfo *fieldInfo) getFieldGoType() string {
 	case protoreflect.BoolKind:
 		return "bool"
 
-	case protoreflect.StringKind, protoreflect.BytesKind, protoreflect.EnumKind:
+	case protoreflect.BytesKind:
+		return "[]byte"
+
+	case protoreflect.StringKind, protoreflect.EnumKind:
 		return "string"
 
 	case protoreflect.MessageKind:
@@ -615,24 +610,20 @@ func (fdInfo *fieldInfo) writeMarshal(t tab, gen *protogen.GeneratedFile, mi map
 			t.P(gen, mapIndex, `, _ = obj["`, fdInfo.fieldKey, `"].(string)`)
 		}
 
-	case protoreflect.BoolKind, protoreflect.StringKind, protoreflect.EnumKind, protoreflect.BytesKind,
-		protoreflect.Sfixed32Kind, protoreflect.Sfixed64Kind, protoreflect.Fixed32Kind,
+	case protoreflect.Sfixed32Kind, protoreflect.Sfixed64Kind, protoreflect.Fixed32Kind,
 		protoreflect.Fixed64Kind, protoreflect.Int32Kind, protoreflect.Int64Kind,
 		protoreflect.Sint32Kind, protoreflect.Sint64Kind, protoreflect.Uint32Kind,
 		protoreflect.Uint64Kind, protoreflect.DoubleKind, protoreflect.FloatKind:
 
-		switch fdInfo.value.Desc.Kind() {
+		t.P(gen, `if v, ok := obj["`, fdInfo.fieldKey, `"].(float64); ok {`)
+		t++
+		t.P(gen, mapIndex, ` = `, fieldType, `(v)`)
+		t--
+		t.P(gen, `}`)
 
-		case protoreflect.BytesKind:
-			t.P(gen, `if v, ok := obj["`, fdInfo.fieldKey, `"].(string); ok {`)
-			t++
-			t.P(gen, mapIndex, `, _ = []byte(v)`)
-			t--
-			t.P(gen, `}`)
-		default:
-			t.P(gen, mapIndex, `, _ = obj["`, fdInfo.fieldKey, `"].(`, fieldType, `)`)
+	case protoreflect.BoolKind, protoreflect.StringKind, protoreflect.EnumKind, protoreflect.BytesKind:
 
-		}
+		t.P(gen, mapIndex, `, _ = obj["`, fdInfo.fieldKey, `"].(`, fieldType, `)`)
 
 	}
 
